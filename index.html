@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yo wassupp</title>
+
+<!-- PARA DILI MA-SPOIL SA IG PREVIEW -->
+<meta property="og:title" content="yo wassupp">
+<meta property="og:description" content="open this 👀">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yo-wassupp.netlify.app/">
+<meta property="og:image" content="">
+<meta name="description" content="open this 👀">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="yo wassupp">
+<meta name="twitter:description" content="open this 👀">
+
+<!-- Faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+min-height:100vh;
+min-height:100dvh;
+background:#1a1a1a;
+font-family:'Fredoka',sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+}
+.video-bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:0;
+overflow:hidden;
+background:#1a1a1a;
+}
+.video-bg video{
+width:100%;
+height:100%;
+object-fit:cover;
+/* keep video on its own GPU layer */
+transform:translateZ(0);
+will-change:transform;
+}
+/* dark overlay (instead of body background, which was hidden behind the video) */
+.video-bg::after{
+content:"";
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.35);
+pointer-events:none;
+}
+#confetti{position:fixed; inset:0; pointer-events:none!important; z-index:10; display:none}
+.phone{
+width:310px;
+height:590px;
+max-width:80vw;
+max-height:78vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+position:relative;
+z-index:5;
+padding:15px;
+cursor:pointer;
+}
+#step-game{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:10px;
+width:100%;
+}
+#step-game h2{
+color:#fff;
+font-size:20px;
+}
+#step-game .hint{
+color:rgba(255,255,255,0.8);
+font-size:12px;
+line-height:1.4;
+max-width:250px;
+}
+#step-game .english{
+font-size:28px;
+color:#ffd86f;
+font-weight:600;
+background:rgba(0,0,0,0.3);
+padding:8px 18px;
+border-radius:12px;
+}
+#step-game .hint-word{
+font-size:14px;
+color:#ffd86f;
+font-weight:600;
+letter-spacing:1px;
+background:rgba(0,0,0,0.3);
+padding:8px 12px;
+border-radius:12px;
+}
+#answer-input{
+width:100%;
+max-width:260px;
+padding:13px 16px;
+border:2px solid rgba(255,255,255,0.4);
+border-radius:99px;
+font-size:16px; /* 16px stops iOS from zooming on focus */
+font-family:'Fredoka',sans-serif;
+text-align:center;
+background:rgba(255,255,255,0.95);
+color:#0a1a6b;
+outline:none;
+}
+#answer-input:focus{
+border-color:#ffd86f;
+box-shadow:0 0 0 3px rgba(255,216,111,0.4);
+}
+#answer-input.shake{
+animation:shakeX 0.4s;
+border-color:#ff5a5a;
+}
+@keyframes shakeX{
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+75%{transform:translateX(8px)}
+}
+#game-msg{
+font-size:12px;
+min-height:18px;
+color:#ffd86f;
+text-align:center;
+max-width:260px;
+}
+#tries{
+font-size:11px;
+color:rgba(255,255,255,0.6);
+}
+#step-music{
+display:none;
+flex-direction:column;
+align-items:center;
+gap:14px;
+}
+#step-music p{
+color:rgba(255,255,255,0.85);
+font-size:13px;
+}
+#music-btn{
+padding:16px 32px;
+border:none;
+background:#fff;
+color:#0a1a6b;
+font-weight:700;
+border-radius:99px;
+cursor:pointer;
+font-size:16px;
+box-shadow:0 4px 14px rgba(80,120,255,0.8); /* lighter shadow = cheaper to render */
+animation: pulse 1.4s infinite;
+will-change:transform;
+}
+@keyframes pulse{
+0%,100%{ transform:scale(1)}
+50%{ transform:scale(1.08)}
+}
+.birthday{display:none; color:#fff; width:100%; padding:0 8px}
+.birthday h1 {
+font-family:'Pacifico', cursive;
+font-size: clamp(15px, 9vw, 35px);
+transform: translateX(-8px);
+background: linear-gradient(90deg, #ffd86f, #ff8ae2, #7afcff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+background-clip:text;
+/* removed filter:drop-shadow — it re-renders every frame over a playing video */
+margin-bottom:14px;
+}
+.msg{
+font-size:13px;
+transform:translateX(-8px);
+line-height:1.35;
+max-width:235px;
+margin:0 auto;
+text-align:center;
+color:rgba(255,255,255,0.92);
+}
+.cake{
+font-size:95px;
+transform:translateX(-8px);
+margin:12px 0;
+animation:cakeBounce 1.2s ease-in-out infinite;
+display:inline-block;
+will-change:transform;
+}
+@keyframes cakeBounce{
+0%,100%{ transform:translateY(0) scale(1) translateX(-8px); }
+30%{ transform:translateY(-10px) scale(1.05) translateX(-8px); }
+50%{ transform:translateY(-6px) scale(1) translateX(-8px); }
+}
+.have{font-size:13px; margin-top:6px; line-height:1.4; max-width:250px;}
+.from{margin-top:10px; font-style:italic; opacity:0.9; font-size:12px}
+.balloon{position:absolute; font-size:22px; animation:rise linear infinite; pointer-events:none!important; z-index:2; will-change:transform}
+@keyframes rise{0%{transform:translateY(100vh)}100%{transform:translateY(-20vh)}}
+#audio-status{color:#8ec2ff; font-size:10px; margin-top:8px}
+
+/* Respect users who prefer less motion / hide video entirely */
+@media (prefers-reduced-motion: reduce){
+.video-bg video{display:none}
+}
+</style>
+</head>
+<body>
+<div class="video-bg">
+<!-- No src here on purpose: the video is attached AFTER the page loads (see script),
+     so the game UI appears instantly and the video never blocks it.
+     poster = still image shown while the video loads / if it can't play. -->
+<video id="bgvid" muted loop playsinline preload="none" poster="birtdi/poster.jpg" disablepictureinpicture></video>
+</div>
+<canvas id="confetti"></canvas>
+<div class="phone" id="phone">
+<div id="step-game">
+<h2>GUESS THE WORD!</h2>
+<div class="english">кликнуть</div>
+<p id="game-msg" style="display:none"></p>
+<input id="answer-input" type="text" placeholder="Type here..." autocomplete="off" autocapitalize="off" />
+<p id="tries">Tries: 0</p>
+</div>
+<div id="step-music">
+<button id="music-btn">▶ кликнуть</button>
+</div>
+<div class="birthday" id="birthday">
+<h1>Happy Birthday!</h1>
+<div class="msg" id="typed"></div>
+<div class="cake">🎂</div>
+<p class="have">May your day be filled with laughter that never fades, love that never withers, and moments so tender they remain etched upon your heart forever.</p>
+<p class="from"> tss </p>
+</div>
+</div>
+<script>
+const phone = document.getElementById('phone');
+const stepGame = document.getElementById('step-game');
+const answerInput = document.getElementById('answer-input');
+const gameMsg = document.getElementById('game-msg');
+const triesEl = document.getElementById('tries');
+const stepMusic = document.getElementById('step-music');
+const musicBtn = document.getElementById('music-btn');
+const birthdayEl = document.getElementById('birthday');
+const typedEl = document.getElementById('typed');
+const confettiCanvas = document.getElementById('confetti');
+const ctx = confettiCanvas.getContext('2d');
+const bgvid = document.getElementById('bgvid');
+let stage = 0;
+let birthdayShown = false;
+let tries = 0;
+
+/* ---------- BACKGROUND VIDEO (lazy + safe) ---------- */
+function startVideo() {
+// skip video on data saver or reduced motion; poster image stays as background
+const conn = navigator.connection || {};
+if (conn.saveData) return;
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+const source = document.createElement('source');
+source.src = 'birtdi/bgvid.mp4';
+source.type = 'video/mp4';
+bgvid.appendChild(source);
+bgvid.preload = 'auto';
+bgvid.load();
+bgvid.muted = true; // some in-app browsers need this set via JS too
+
+const tryPlay = () => {
+const p = bgvid.play();
+if (p && p.catch) p.catch(() => {}); // autoplay blocked -> poster stays, no errors
+};
+// only start once enough data is buffered, so it doesn't stutter
+bgvid.addEventListener('canplaythrough', tryPlay, { once: true });
+tryPlay();
+}
+window.addEventListener('load', () => setTimeout(startVideo, 200));
+
+// pause the video when the tab/app is hidden, resume when back
+document.addEventListener('visibilitychange', () => {
+if (document.hidden) bgvid.pause();
+else if (bgvid.querySelector('source')) {
+const p = bgvid.play();
+if (p && p.catch) p.catch(() => {});
+}
+});
+
+/* ---------- AUDIO (lazy) ---------- */
+const audio = new Audio();
+audio.preload = 'none';
+audio.src = 'birtdi/alarma.mp3';
+audio.loop = true;
+audio.volume = 1;
+
+setTimeout(() => answerInput.focus(), 300);
+function normalize(str) {
+return str.toLowerCase().trim().replace(/\s+/g, ' ');
+}
+function checkAnswer() {
+const ans = normalize(answerInput.value);
+tries++;
+triesEl.textContent = 'Tries: ' + tries;
+if (ans === 'click' || ans === 'to click' || ans === 'click it' || ans === 'kliknut') {
+answerInput.style.borderColor = '#4ade80';
+setTimeout(() => {
+stepGame.style.display = 'none';
+stepMusic.style.display = 'flex';
+stage = 1;
+}, 500);
+} else if (ans === '') {
+answerInput.classList.add('shake');
+setTimeout(() => answerInput.classList.remove('shake'), 500);
+} else {
+answerInput.classList.add('shake');
+setTimeout(() => answerInput.classList.remove('shake'), 500);
+answerInput.select();
+}
+}
+answerInput.addEventListener('keydown', (e) => {
+e.stopPropagation();
+if (e.key === 'Enter') checkAnswer();
+});
+answerInput.addEventListener('click', (e) => e.stopPropagation());
+musicBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+audio.play().then(() => {
+showBirthday();
+}).catch(() => {
+showBirthday();
+});
+});
+function showBirthday() {
+stepMusic.style.display = 'none';
+birthdayEl.style.display = 'block';
+stage = 2;
+birthdayShown = true;
+typeWriter("DAVID EARL CAJES");
+launchConfetti();
+spawnBalloons();
+}
+phone.addEventListener('click', () => {
+if (stage === 2) {
+document.body.style.transition = 'opacity 0.6s';
+document.body.style.opacity = '0';
+setTimeout(() => {
+window.close();
+setTimeout(() => {
+document.body.style.opacity = '1';
+}, 500);
+}, 600);
+}
+});
+function typeWriter(t, i = 0) {
+if (i === 0) typedEl.textContent = '';
+if (i < t.length) {
+typedEl.textContent += t.charAt(i);
+setTimeout(() => typeWriter(t, i + 1), 110);
+}
+}
+function launchConfetti() {
+confettiCanvas.style.display = 'block';
+confettiCanvas.width = innerWidth;
+confettiCanvas.height = innerHeight;
+// fewer pieces = smoother while the video is playing underneath
+const count = innerWidth < 600 ? 50 : 90;
+const pieces = Array.from({length: count}, () => ({
+x: Math.random() * confettiCanvas.width,
+y: -20,
+r: Math.random() * 5 + 3,
+c: `hsl(${Math.random()*360},100%,70%)`,
+vy: Math.random() * 3 + 2,
+vx: (Math.random() - 0.5) * 2
+}));
+(function draw() {
+ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+pieces.forEach(p => {
+p.y += p.vy;
+p.x += p.vx;
+if (p.y > confettiCanvas.height) p.y = -10;
+ctx.fillStyle = p.c;
+ctx.beginPath();
+ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+ctx.fill();
+});
+if (birthdayShown) requestAnimationFrame(draw);
+})();
+}
+function spawnBalloons() {
+['🎈','🎉','🎊','✨','💖'].forEach((e, i) => {
+const b = document.createElement('div');
+b.className = 'balloon';
+b.textContent = e;
+b.style.left = Math.random() * 85 + '%';
+b.style.animationDuration = (5 + Math.random() * 4) + 's';
+b.style.animationDelay = i * 0.3 + 's';
+document.body.appendChild(b);
+});
+}
+</script>
+</body>
+</html>
